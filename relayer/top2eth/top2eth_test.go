@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"math/big"
+	"sync"
 	"testing"
 	"toprelayer/base"
 
@@ -59,10 +60,18 @@ func TestSubmitHeader(t *testing.T) {
 	}
 	t.Log("hash:", tx.Hash())
 
-	/* err = sub.StartRelayer(&sync.WaitGroup{})
+}
+
+func TestStartRelayer(t *testing.T) {
+	sub := &Top2EthRelayer{}
+	err := sub.Init(SUBMITTERURL, LISTENURL, DEFAULTPATH, "", abipath, base.ETH, CONTRACT, 90, 0, false)
 	if err != nil {
 		t.Fatal(err)
-	} */
+	}
+	err = sub.StartRelayer(&sync.WaitGroup{})
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestEstimateGas(t *testing.T) {

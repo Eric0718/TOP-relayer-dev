@@ -200,7 +200,7 @@ func (et *Eth2TopRelayer) StartRelayer(wg *sync.WaitGroup) error {
 		timeout := time.NewTimer(timeoutDur)
 		defer timeout.Stop()
 
-		//var syncStartHeight uint64 = 6000
+		var syncStartHeight uint64 = 1 //test mock
 		var delay time.Duration = time.Duration(1)
 		for {
 			time.Sleep(time.Second * delay)
@@ -209,21 +209,20 @@ func (et *Eth2TopRelayer) StartRelayer(wg *sync.WaitGroup) error {
 				done <- struct{}{}
 				return
 			default:
-				bridgeCurrentHeight, err := et.getTopBridgeCurrentHeight()
+				/* bridgeCurrentHeight, err := et.getTopBridgeCurrentHeight()
 				if err != nil {
 					logger.Error(err)
 					delay = time.Duration(ERRDELAY)
 					break
 				}
-				syncStartHeight := bridgeCurrentHeight + 1
-				/* ethCurrentHeight, err := et.ethsdk.BlockNumber(context.Background())
+				syncStartHeight := bridgeCurrentHeight + 1 */
+				ethCurrentHeight, err := et.ethsdk.BlockNumber(context.Background())
 				if err != nil {
 					logger.Error(err)
 					delay = time.Duration(ERRDELAY)
 					break
 				}
-				ethConfirmedBlockHeight := ethCurrentHeight - uint64(et.certaintyBlocks) */
-				var ethConfirmedBlockHeight uint64 = 1000 //test mock
+				ethConfirmedBlockHeight := ethCurrentHeight - uint64(et.certaintyBlocks)
 				if syncStartHeight <= ethConfirmedBlockHeight {
 					hashes, err := et.signAndSendTransactions(syncStartHeight, ethConfirmedBlockHeight)
 					if len(hashes) > 0 {
@@ -232,7 +231,7 @@ func (et *Eth2TopRelayer) StartRelayer(wg *sync.WaitGroup) error {
 							delay = time.Duration(ERRDELAY)
 							break
 						}
-						//syncStartHeight = ethConfirmedBlockHeight + 1 //test mock
+						syncStartHeight = ethConfirmedBlockHeight + 1 //test mock
 
 						logger.Debug("timeout.Reset:%v", timeoutDur)
 						logger.Info("Eth2TopRelayer sent block header from %v to :%v", syncStartHeight, ethConfirmedBlockHeight)
@@ -262,7 +261,10 @@ func (et *Eth2TopRelayer) batch(headers []*types.Header, nonce uint64) (common.H
 	logger.Info("batch headers number:", len(headers))
 	if et.chainId == base.TOP && et.verifyBlock {
 		for _, header := range headers {
-			et.verifyBlocks(header)
+			err := et.verifyBlocks(header)
+			if err != nil {
+				return common.Hash{}, err
+			}
 		}
 	}
 	data, err := base.EncodeHeaders(headers)
@@ -319,6 +321,8 @@ func (et *Eth2TopRelayer) signAndSendTransactions(lo, hi uint64) ([]common.Hash,
 }
 
 func (et *Eth2TopRelayer) verifyBlocks(header *types.Header) error {
+	//request url
+	//return true/false/delay
 	return nil
 }
 

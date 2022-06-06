@@ -1,6 +1,10 @@
 package topsdk
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/ethereum/go-ethereum/common"
+)
 
 func newtopsdk() (*TopSdk, error) {
 	url := "http://192.168.50.204:19086"
@@ -13,16 +17,16 @@ func TestGetTopElectBlockHeadByHeight(t *testing.T) {
 		t.Fatalf("NewSDK failed,error:%v", err)
 	}
 
-	h, err := sdk.GetLatestTopElectBlockHeight()
+	/* h, err := sdk.GetLatestTopElectBlockHeight()
 	if err != nil {
 		t.Fatalf("GetLatestTopElectBlockHeight failed,error:%v", err)
-	}
+	} */
 
-	result, err := sdk.GetTopElectBlockHeadByHeight(h)
+	result, err := sdk.GetTopElectBlockHeadByHeight(1)
 	if err != nil {
 		t.Fatalf("GetTopElectBlockHeadByHeight failed,error:%v", err)
 	}
-	t.Logf("GetTopElectBlockHeadByHeight ok,result:%v", result)
+	t.Logf("GetTopElectBlockHeadByHeight ok,result:%v", common.Bytes2Hex(result))
 }
 
 func TestGetLatestTopElectBlockHeight(t *testing.T) {

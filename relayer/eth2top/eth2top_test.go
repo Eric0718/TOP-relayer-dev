@@ -13,7 +13,8 @@ import (
 
 const SUBMITTERURL string = "http://192.168.50.204:19086"
 
-const LISTENURL string = "http://192.168.50.235:8545"
+//const LISTENURL string = "http://192.168.50.235:8545"
+const LISTENURL string = "https://rinkeby.infura.io/v3/a3564d02d1bc4df58b7079a06b59a1cc"
 
 var DEFAULTPATH = "../../.relayer/wallet/top"
 var CONTRACT common.Address = common.HexToAddress("0xa3e165d80c949833C5c82550D697Ab31Fd3BB446")
@@ -27,30 +28,43 @@ func TestSubmitHeader(t *testing.T) {
 	}
 	var batchHeaders []*types.Header
 
-	currH, err := sub.getTopBridgeCurrentHeight()
+	/* 	currH, err := sub.getTopBridgeCurrentHeight()
+	   	if err != nil {
+	   		t.Fatal(err)
+	   	}
+	   	t.Log("bridge contract current height:", currH) */
+
+	currH := uint64(10781005)
+
+	header0, err := sub.ethsdk.HeaderByNumber(context.Background(), big.NewInt(0).SetUint64(currH))
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log("bridge contract current height:", currH)
 
-	header, err := sub.ethsdk.HeaderByNumber(context.Background(), big.NewInt(0).SetUint64(currH+1))
+	data1, _ := base.EncodeHeader(header0)
+	t.Log("hex data1:", common.Bytes2Hex(data1))
+
+	dd, _ := header0.MarshalJSON()
+	t.Log("header data1:", string(dd))
+
+	header1, err := sub.ethsdk.HeaderByNumber(context.Background(), big.NewInt(0).SetUint64(currH+1))
 	if err != nil {
 		t.Fatal(err)
 	}
-	{
-		bt, _ := header.MarshalJSON()
-		t.Log("header:", string(bt))
-	}
+	batchHeaders = append(batchHeaders, header1)
+	data2, _ := base.EncodeHeader(batchHeaders)
+	t.Log("hex data2:", common.Bytes2Hex(data2))
+	dd2, _ := header1.MarshalJSON()
+	t.Log("header data2:", string(dd2))
 
-	batchHeaders = append(batchHeaders, header)
+	return
+
+	batchHeaders = append(batchHeaders, header1)
 	header2, err := sub.ethsdk.HeaderByNumber(context.Background(), big.NewInt(0).SetUint64(currH+2))
 	if err != nil {
 		t.Fatal(err)
 	}
-	{
-		bt, _ := header2.MarshalJSON()
-		t.Log("header2:", string(bt))
-	}
+
 	batchHeaders = append(batchHeaders, header2)
 
 	data, err := base.EncodeHeaders(batchHeaders)

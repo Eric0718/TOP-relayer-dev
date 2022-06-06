@@ -27,8 +27,8 @@ const (
 
 const (
 	GETLATESTETTOPELECTBLOCKHEADER = "getLatestTopElectBlockHeader"
-	GETTOPELECTBLOCKHEADBYHEIGHT   = "top_getBlockByNumber"
-	GETLATESTTOPELECTBLOCKHEIGHT   = "top_blockNumber"
+	GETTOPELECTBLOCKHEADBYHEIGHT   = "top_getRelayBlockByNumber"
+	GETLATESTTOPELECTBLOCKHEIGHT   = "top_relayBlockNumber"
 )
 
 func NewTopSdk(url string) (*TopSdk, error) {
